@@ -425,7 +425,7 @@ EOF
 
 server {
 EOF
-        echo "  server_name $DOMAIN;" >>../configs/proxy/proxy.conf
+        echo "  server_name www.$DOMAIN;" >>../configs/proxy/proxy.conf
         echo "  return 301 \$scheme://$DOMAIN\$request_uri;" >>../configs/proxy/proxy.conf
         cat <<'EOF' >>../configs/proxy/proxy.conf
   listen 443 ssl;
