@@ -5,6 +5,7 @@
   failed_when:
     - umount_dir.failed == true
     - '"not mounted" not in umount_dir.stderr'
+    - '"no mount point specified" not in umount_dir.stderr'
 
 - name: Get root FS type
   shell: df -hT / | grep / | awk -F' ' '{print $2}'
