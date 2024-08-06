@@ -1,0 +1,5 @@
+docker/
+frontend/nginx*proxy.conf
+proxy/*.ini
+proxy/proxy.conf
+ssl_certs/*.pem

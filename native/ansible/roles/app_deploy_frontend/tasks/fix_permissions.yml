@@ -1,0 +1,10 @@
+---
+- name: Fix permissions (owned by {{ username }})
+  become: true
+  shell: chown -R "$(id -u {{ username }})":"$(id -g {{ username }})" {{ item }}
+  with_items:
+    - "{{ appDir.app_directory }}"
+
+- name: Fix nginx directory permissions (onwed by nginx user)
+  become: true
+  shell: "chown -R {{ nginx.user }}:{{ nginx.user }} /usr/share/nginx/ec2configs/"

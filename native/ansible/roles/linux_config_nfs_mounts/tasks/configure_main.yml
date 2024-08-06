@@ -1,0 +1,36 @@
+- name: Configure exports
+  become: true
+  lineinfile:
+    dest: "/etc/exports"
+    line: "{{ appData_dir }} {{ allowed_subnet }}(rw,sync,no_subtree_check)"
+
+- name: Start and enable nfs packages
+  become: true
+  service:
+    name: "{{ nfs.service_name }}"
+    state: restarted
+    enabled: true 
+
+- name: Remove existing terraform providers
+  become: true
+  shell: " rm -rf {{ providers_path }}/*"
+
+- name: Write terraform providers file
+  become: true
+  blockinfile:
+    create: true
+    dest: "{{ providers_path }}/init.tf"
+    block: "{{ tf_init_content }}"
+
+- name: Mirror terraform providers
+  become: true
+  shell: "cd {{ providers_path }} && terraform providers mirror ."
+
+- name: Fix Permissions
+  become: true
+  shell: "chown -R {{ username }}:{{ username }} {{ appData_dir }}"
+
+- name: Update exports
+  become: true
+  shell: exportfs -r
+

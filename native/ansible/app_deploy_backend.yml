@@ -1,0 +1,14 @@
+---
+- name: Run Deploy Backend
+  become_method: sudo
+  become_user: root
+  hosts: backendHosts
+  gather_facts: false
+  tasks:
+    - name: Deploy Backend | Wait for connection
+      wait_for_connection:
+    - name: Deploy Backend | Gather facts
+      setup:
+    - name: Deploy Backend | Deployment
+      include_role:
+        name: app_deploy_backend

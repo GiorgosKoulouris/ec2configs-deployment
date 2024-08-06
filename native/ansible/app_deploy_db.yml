@@ -1,0 +1,14 @@
+---
+- name: Run Deploy Database
+  become_method: sudo
+  become_user: root
+  hosts: dbHosts
+  gather_facts: false
+  tasks:
+    - name: Deploy Database | Wait for connection
+      wait_for_connection:
+    - name: Deploy Database | Gather facts
+      setup:
+    - name: Deploy Database | Deployment
+      include_role:
+        name: app_deploy_db

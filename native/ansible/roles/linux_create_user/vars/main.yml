@@ -1,0 +1,14 @@
+---
+user_options:
+  sudo_permissions: |
+    {{ username }} ALL=(ALL) NOPASSWD: ALL
+  alias_for_sudo: |
+    alias systemctl='sudo {{ systemctl_path.stdout }}'
+
+# user_options:
+#   sudo_permissions: |
+#     {{ username }} ALL=(ALL) NOPASSWD: {{ systemctl_path.stdout }} start ec2c, {{ systemctl_path.stdout }} stop ec2c, {{ systemctl_path.stdout }} restart ec2c, {{ systemctl_path.stdout }} daemon-reload
+#     {{ username }} ALL=(ALL) NOPASSWD: /usr/bin/cp /app/backend/ec2c.service.template /etc/systemd/system/ec2c.service
+#   alias_for_sudo: |
+#     alias systemctl='sudo {{ systemctl_path.stdout }}'
+#     alias ec2c-backend-updatedaemon='sudo cp /app/backend/ec2c.service.template /etc/systemd/system/ec2c.service && systemctl daemon-reload && systemctl restart ec2c'

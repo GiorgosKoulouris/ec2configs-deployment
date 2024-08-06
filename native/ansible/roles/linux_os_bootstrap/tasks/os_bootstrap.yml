@@ -1,0 +1,80 @@
+---
+- name: OS Bootstrap | Set timezone
+  become: true
+  timezone:
+    name: "{{ timezone | default('Europe/Athens') }}"
+
+- name: Change hostname
+  become: true
+  shell: "hostnamectl set-hostname {{ hostname }}"
+
+- name: OS Bootstrap | Modify ssh settings
+  become: true
+  block:
+    - name: Modify ssh settings | Modify configuration file
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        block: |
+          PermitRootLogin no
+          ClientAliveInterval 30
+          ClientAliveCountMax 3
+          ChallengeResponseAuthentication no
+          PasswordAuthentication no
+          UsePAM no
+        state: present
+      register: sshd_config_mod
+
+    - name: Modify ssh settings | Restart sshd
+      service:
+        name: "{{ item }}"
+        state: restarted
+      register: stop_service
+      failed_when:
+        - stop_service.failed == true
+        - '"Could not find the requested service" not in stop_service.msg'
+      loop:
+        - sshd
+        - ssh
+      when: sshd_config_mod.changed
+    
+- name: OS Bootstrap | Write MOTD
+  become: true
+  copy:
+    content: "{{ motd_content }}" 
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644
+
+- name: OS Bootstrap | Disable ipv6
+  become: true
+  blockinfile:
+    path: /etc/sysctl.d/ipv6.conf
+    block: |
+      net.ipv6.conf.all.disable_ipv6 = 1
+      net.ipv6.conf.default.disable_ipv6 = 1
+      net.ipv6.conf.lo.disable_ipv6 = 1
+    create: true
+
+- name: OS Bootstrap | Disable firewall services
+  become: true
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  register: stop_service
+  failed_when:
+    - stop_service.failed == true
+    - '"Could not find the requested service" not in stop_service.msg'
+  loop:
+    - firewalld
+    - ufw
+
+- name: OS Bootstrap | Patch
+  become: true
+  when: patch | default(false) | bool
+  block:
+    - name: OS Bootstrap | Patch | Update
+      shell: "{{ update_command }} {{ upgrade_command }}"
+    - name: OS Bootstrap | Patch | Reboot
+      reboot:

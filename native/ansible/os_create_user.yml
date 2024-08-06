@@ -1,0 +1,15 @@
+---
+- name: Run Create App User
+  become_method: sudo
+  become_user: root
+  hosts: allHosts
+  gather_facts: false
+  tasks:
+    - name: Create App User | Wait for connection
+      wait_for_connection:
+    - name: Create App User | Gather facts
+      setup:
+    - name: Create App User | Create User
+      include_role:
+        name: linux_create_user
+        

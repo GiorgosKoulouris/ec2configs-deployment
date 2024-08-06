@@ -1,0 +1,8 @@
+---
+appData_dir: /appData
+tf_init_content: |
+  provider "azurerm" {
+    features {}
+  }
+  provider "aws" {}
+providers_path: /appData/providers

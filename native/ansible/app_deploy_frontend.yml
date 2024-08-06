@@ -1,0 +1,14 @@
+---
+- name: Run Deploy Frontend
+  become_method: sudo
+  become_user: root
+  hosts: frontendHosts
+  gather_facts: false
+  tasks:
+    - name: Deploy Frontend | Wait for connection
+      wait_for_connection:
+    - name: Deploy Frontend | Gather facts
+      setup:
+    - name: Deploy Frontend | Deployment
+      include_role:
+        name: app_deploy_frontend

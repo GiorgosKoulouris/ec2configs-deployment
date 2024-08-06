@@ -1,0 +1,33 @@
+---
+- name: Fix node/npm modules for RHEL8 and OL8 distros
+  become: true
+  when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8'
+  shell: "{{ fix_modules_command.node }}"
+
+- name: Install Packages
+  become: true
+  package:
+    state: latest
+    name: 
+      - npm
+      - git
+      - python3
+      - python3-pip
+        
+- name: Install terraform
+  become: true
+  block:
+    - name: Install terraform prerequisites
+      package:
+        name: "{{ terraform.prerequisites }}"
+        state: latest
+
+    - name: Add terraform repository
+      become: true
+      shell: "{{ terraform.repo_command }}"
+
+    - name: Install terraform 
+      become: true
+      package:
+        name: "{{ terraform.package }}"
+        state: latest

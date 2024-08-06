@@ -1,0 +1,19 @@
+---
+- name: Deploy Frontend | Load distribution variables
+  include_tasks: load_vars.yml
+
+- name: Deploy Frontend | Load service facts
+  service_facts:
+
+- name: Deploy Frontend | Install Packages
+  include_tasks: install_packages.yml
+
+- name: Deploy Frontend | Clone Source Repository
+  include_tasks: clone_repo.yml
+
+- name: Deploy Frontend | Initialize Frontend
+  include_tasks: init_app.yml
+
+- name: Deploy Frontend | Fix Permissions
+  include_tasks: fix_permissions.yml
+  

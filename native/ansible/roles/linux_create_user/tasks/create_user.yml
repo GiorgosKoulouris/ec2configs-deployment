@@ -1,0 +1,44 @@
+---
+- name: Create user
+  become: true
+  ansible.builtin.user:
+    name: "{{ username }}"
+    create_home: yes
+    password: "{{ password }}"
+    update_password: always
+    shell: /bin/bash
+
+- name: Add SSH public key
+  become: true
+  ansible.posix.authorized_key:
+    user: "{{ username }}"
+    key: "{{ lookup('file', ec2cadmin_ssh_public_key_file ) }}"
+    state: present
+    exclusive: true
+
+- name: Get systemctl path
+  shell: which systemctl
+  register: systemctl_path
+
+- name: Grant sudo permissions for the application user
+  become: true
+  block:
+    - name: Modify sudoers file for {{ username }}
+      become: true
+      blockinfile:
+        create: true
+        content: "{{ user_options.sudo_permissions }}"
+        path: "/etc/sudoers.d/99-{{ username }}-user"
+        owner: root
+        group: root
+        mode: 0640
+
+    - name: Create alias file for {{ username }}
+      when: user_options.alias_for_sudo is defined
+      become: true
+      blockinfile:
+        create: true
+        content: "{{ user_options.alias_for_sudo }}"
+        path: "/home/{{ username }}/.bash_profile"
+        mode: 0644
+        

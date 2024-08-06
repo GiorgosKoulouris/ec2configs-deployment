@@ -1,0 +1,7 @@
+---
+- name: Fix permissions (owned by {{ username }})
+  become: true
+  shell: chown -R "$(id -u {{ username }})":"$(id -g {{ username }})" {{ item }}
+  with_items:
+    - "{{ appDir.app_directory }}"
+    - "{{ appDir.appData_directory }}"

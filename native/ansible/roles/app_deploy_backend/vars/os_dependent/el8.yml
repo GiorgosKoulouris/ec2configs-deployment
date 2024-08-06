@@ -1,0 +1,10 @@
+---
+terraform:
+  prerequisites: yum-utils
+  repo_command: yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+  package: terraform
+fix_modules_command:
+  node: |
+    dnf remove -y npm
+    dnf module reset -y nodejs
+    dnf module enable -y nodejs:20

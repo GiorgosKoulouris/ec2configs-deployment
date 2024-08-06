@@ -1,0 +1,65 @@
+[Unit]
+Description=EC2 Configs Backend
+
+[Service]
+ExecStart=/usr/bin/node /app/backend/index.js
+
+# Output to syslog
+# StandardOutput=syslog
+# StandardError=syslog
+SyslogIdentifier=ec2c
+RestartSec=3
+Restart=always
+
+WorkingDirectory=/app/backend/
+
+# ======== Modify this Block =============
+# Fix this based on the user you created
+User=ec2cadmin
+Group=ec2cadmin
+
+# Azure tenant ID
+Environment=AZ_TENANT_ID=
+# Azure application ID
+Environment=AZ_CLIENT_ID=
+# Entra group ID that defines any user as an admin of this application
+Environment=AZ_ADMIN_GRP_ID=
+
+# IP or hostname of the DB
+Environment=DB_HOST=
+# Port that the DB is listening to
+Environment=DB_PORT=3306
+# Database user
+Environment=DB_USER=ec2cdbuser
+# Database password
+Environment=DB_PASSWORD=
+#========= Modify only the block above ===============
+
+
+# ============ Do not change this block unless you know what you're doing ==============
+# Do not change
+Environment=APP_ENV=local
+# Config of the cluster. Only necessary when running workloads on kubernetes
+Environment=KUBE_CONFIG_FOLDER=~/.kube
+# Change based on what you are running your python workloads on (local/docker/kubernetes)
+Environment=PYTHON_ENV=local
+# Change only to change the python environment when run locally (use full path using a VENV)
+Environment=PYTHON_EXEC=python3
+# Directory containing all the python scripts. Used when python is executed locally or on docker
+Environment=PYTHON_SCRIPT_ROOT_PATH=../python
+# Change based on what you are running your terraform workloads on (local/docker/kubernetes)
+Environment=TERRAFORM_ENV=local
+
+# Directory that will contain all of the stored configurations
+Environment=HOST_DATA_ROOT_FOLDER=/appData/configs
+# Directory that will contain all of the logs of the app
+Environment=HOST_DATA_LOGS_FOLDER=/appData/logs
+# Directory containing the mirrored terraform providers
+Environment=HOST_DATA_PROVIDERS_FOLDER=/appData/providers
+
+# Database name
+Environment=DB_DATABASE=ec2c
+# ============ Do not change this block unless you know what you're doing ==============
+
+[Install]
+WantedBy=multi-user.target

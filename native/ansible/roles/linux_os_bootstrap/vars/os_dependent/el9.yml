@@ -1,0 +1,4 @@
+---
+install_command: dnf install -y
+update_command: echo &&
+upgrade_command: dnf update -y

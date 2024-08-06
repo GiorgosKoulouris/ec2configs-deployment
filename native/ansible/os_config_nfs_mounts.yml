@@ -1,0 +1,14 @@
+---
+- name: Run Config NFS mounts
+  become_method: sudo
+  become_user: root
+  hosts: backendHosts
+  gather_facts: false
+  tasks:
+    - name: Config NFS mounts | Wait for connection
+      wait_for_connection:
+    - name: Config NFS mounts | Gather facts
+      setup:
+    - name: Config NFS mounts | Config Mounts
+      include_role:
+        name: linux_config_nfs_mounts

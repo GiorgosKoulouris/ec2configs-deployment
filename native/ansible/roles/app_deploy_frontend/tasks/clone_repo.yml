@@ -1,0 +1,36 @@
+---
+- name: Cleanup old files
+  become: true
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: 
+    - "{{ appDir.app_directory }}/frontend"
+    - "{{ appDir.temp_directory }}"
+
+- name: Clone git repository
+  become: true
+  git:
+    repo: "{{ source_repo }}"
+    dest: "{{ appDir.temp_directory }}"
+    accept_newhostkey: true
+
+- name: Create application directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  with_items: 
+    - "{{ appDir.app_directory }}"
+    - "{{ appDir.app_directory }}/frontend"
+
+- name: Move files to app directory
+  become: true
+  shell: "mv {{ item }} {{ appDir.app_directory }}"
+  with_items: 
+    - "{{ appDir.temp_directory }}/frontend"
+
+- name: Cleanup temp files
+  become: true
+  shell: rm -rf {{ appDir.temp_directory }}

@@ -1,0 +1,7 @@
+---
+- name: Linux Bootstrap | Load distribution variables
+  include_tasks: load_vars.yml
+- name: Linux Bootstrap | Load service facts
+  service_facts:
+- name: Linux Bootstrap | OS Configuration
+  include_tasks: os_bootstrap.yml

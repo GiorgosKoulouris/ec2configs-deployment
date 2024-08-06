@@ -1,0 +1,12 @@
+---
+- name: Linux Bootstrap | Load Amazon or Ubuntu distribution variables
+  ansible.builtin.include_vars: "vars/os_dependent/{{ ansible_facts['distribution']|lower }}{{ ansible_facts['distribution_major_version'] }}.yml"
+  when: ansible_facts['distribution'] in ['Ubuntu','Amazon']
+
+- name: Linux Bootstrap | Load SUSE distribution variables
+  ansible.builtin.include_vars: "vars/os_dependent/sles{{ ansible_facts['distribution_major_version'] }}.yml"
+  when: ansible_facts['os_family'] == "Suse"
+
+- name: Linux Bootstrap | Load RedHat, CentOS, Oracle distribution variables
+  ansible.builtin.include_vars: "vars/os_dependent/el{{ ansible_facts['distribution_major_version'] }}.yml"
+  when: ansible_facts['distribution'] in ['CentOS','OracleLinux','RedHat']

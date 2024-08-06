@@ -1,0 +1,33 @@
+---
+- name: Fix nginx modules for RHEL8 and OL8 distros
+  become: true
+  when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8'
+  block:
+    - name: Remove nginx current installations
+      package:
+        name: nginx
+        state: absent
+
+    - name: Fix npm/node module versions
+      shell: "{{ fix_modules_command.nginx }}"
+
+- name: Fix npm modules for RHEL8 and OL8 distros
+  become: true
+  when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8' and 'backendHosts' not in group_names
+  block:
+    - name: Remove npm current installations
+      package:
+        name: npm
+        state: absent
+
+    - name: Fix npm/node module versions
+      shell: "{{ fix_modules_command.node }}"
+
+- name: Install Packages
+  become: true
+  package:
+    state: latest
+    name: 
+      - npm
+      - git
+      - nginx

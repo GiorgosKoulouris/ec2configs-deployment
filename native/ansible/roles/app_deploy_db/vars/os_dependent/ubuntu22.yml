@@ -1,0 +1,5 @@
+---
+mariaDB:
+  package: mariadb-server
+  socket: /var/run/mysqld/mysqld.sock
+  conf_file: /etc/mysql/mariadb.conf.d/50-server.cnf

@@ -1,0 +1,23 @@
+---
+- name: Deploy Backend | Load distribution variables
+  include_tasks: load_vars.yml
+
+- name: Deploy Backend | Load service facts
+  service_facts:
+
+- name: Deploy Backend | Install Packages
+  include_tasks: install_packages.yml
+
+- name: Deploy Backend | Configure dedicated app data disk
+  when: appdata_disk_configured | default(false) | bool and ( ( ha_configured | default(false) | bool and ansible_default_ipv4.address == main_host ) or ( not ha_configured | default(false) | bool ) )
+  include_tasks: config_appdata_disk.yml
+
+- name: Deploy Backend | Clone Source Repository
+  include_tasks: clone_repo.yml
+
+- name: Deploy Backend | Initialize Backend
+  include_tasks: init_app.yml
+
+- name: Deploy Backend | Fix Permissions
+  include_tasks: fix_permissions.yml
+  

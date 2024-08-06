@@ -1,0 +1,7 @@
+---
+- name: Deploy Database | Load distribution variables
+  include_tasks: load_vars.yml
+- name: Deploy Database | Load service facts
+  service_facts:
+- name: Deploy Database | Deploy Database
+  include_tasks: deploy_db.yml

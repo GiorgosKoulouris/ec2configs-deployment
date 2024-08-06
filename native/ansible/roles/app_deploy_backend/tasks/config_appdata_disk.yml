@@ -1,0 +1,35 @@
+- name: Unmount everything on the specific mountpoint
+  become: true
+  shell: "umount {{ appDir.appData_directory }}"
+  register: umount_dir
+  failed_when:
+    - umount_dir.failed == true
+    - '"not mounted" not in umount_dir.stderr'
+
+- name: Get root FS type
+  shell: df -hT / | grep / | awk -F' ' '{print $2}'
+  register: fs_type
+
+- name: Create FS on the disk
+  become: true
+  shell: "mkfs.{{ fs_type.stdout }} /dev/{{ appdata_diskname }} -f"
+
+- name: Create appdata mountpoint
+  become: true
+  file:
+    path: "{{ appDir.appData_directory }}"
+    state: directory
+    mode: '0755'
+
+- name: Create fstab entry for the dedicated disk
+  become: true
+  ansible.posix.mount:
+    path: "{{ appDir.appData_directory }}"
+    src: "/dev/{{ appdata_diskname }}"
+    fstype: "{{ fs_type.stdout }}"
+    opts: defaults
+    state: present
+
+- name: Mount the drive
+  become: true
+  shell: mount -a

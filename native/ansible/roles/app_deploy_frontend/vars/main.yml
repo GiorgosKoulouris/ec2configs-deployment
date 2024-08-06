@@ -1,0 +1,6 @@
+---
+source_repo: https://github.com/GiorgosKoulouris/ec2configs.git
+appDir:
+  temp_directory: "/root/ec2configs_tmp"
+  app_directory: "/app"
+  appData_directory: "/appData"

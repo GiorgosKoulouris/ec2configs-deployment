@@ -1,0 +1,7 @@
+---
+- name: Deploy Proxy | Load distribution variables
+  include_tasks: load_vars.yml
+- name: Deploy Proxy | Load service facts
+  service_facts:
+- name: Deploy Proxy | Installation
+  include_tasks: deploy_proxy.yml

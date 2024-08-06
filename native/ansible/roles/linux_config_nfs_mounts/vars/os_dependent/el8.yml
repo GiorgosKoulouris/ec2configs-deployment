@@ -1,0 +1,10 @@
+---
+terraform:
+  prerequisites: yum-utils
+  repo_command: yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+  package: terraform
+nfs:
+  package_name: 
+    - nfs-utils
+    - rpcbind
+  service_name: nfs-server

@@ -1,0 +1,14 @@
+---
+- name: Run Deploy Proxy
+  become_method: sudo
+  become_user: root
+  hosts: proxyHosts
+  gather_facts: false
+  tasks:
+    - name: Deploy Proxy | Wait for connection
+      wait_for_connection:
+    - name: Deploy Proxy | Gather facts
+      setup:
+    - name: Deploy Proxy | Deployment
+      include_role:
+        name: app_deploy_proxy

@@ -1,0 +1,128 @@
+- name: Copy environment files
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/frontend/.env' ) }}"
+    dest: "{{ appDir.app_directory }}/frontend/.env"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy npm config file
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/frontend/package.json' ) }}"
+    dest: "{{ appDir.app_directory }}/frontend/package.json"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Install node packages for the frontend application
+  become: true
+  community.general.npm:
+    path: "{{ appDir.app_directory }}/frontend"
+    name: "{{ item }}"
+  with_items: 
+    - "@azure/msal-browser"
+    - "@azure/msal-react"
+    - "@emotion/react"
+    - "@emotion/style"
+    - "@emotion/styled"
+    - "@mui/material"
+    - "@testing-library/jest-dom"
+    - "@testing-library/react"
+    - "@testing-library/user-event"
+    - axios
+    - jwt-decode
+    - react
+    - react-dom
+    - react-icons
+    - react-loading
+    - react-router-dom
+    - react-scripts
+    - styled-components
+    - web-vitals
+
+- name: Create necessary system directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: 
+    - /usr/share/nginx/ec2configs
+    - /etc/nginx/certs
+
+- name: Copy main nginx config file
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/frontend/nginx-main.conf' ) }}"
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Remove any user related options from the main nginx conf file
+  become: true
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    state: absent
+    regexp: 'user *;'
+
+- name: Add the correct user on main nginx conf file based on distro
+  become: true
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    insertbefore: '^worker_processes auto;'
+    line: "user {{ nginx.user }};"
+
+- name: Copy application nginx conf file (direct)
+  become: true
+  when: not behind_proxy | default(false) | bool
+  copy:
+    content: "{{ lookup('file', '../configs/frontend/nginx-no-proxy.conf' ) }}"
+    dest: /etc/nginx/conf.d/ec2configs.conf
+    owner: root
+    group: root
+    mode: 0644
+- name: Copy application nginx conf file (behind proxy)
+  become: true
+  when: behind_proxy | default(false) | bool
+  copy:
+    content: "{{ lookup('file', '../configs/frontend/nginx-behind-proxy.conf' ) }}"
+    dest: /etc/nginx/conf.d/ec2configs.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy SSL certificates
+  become: true
+  when: not behind_proxy | default(false) | bool
+  block:
+    - name: Copy certificate
+      copy:
+        content: "{{ lookup('file', '../configs/ssl_certs/ec2configs.pem' ) }}"
+        dest: /etc/nginx/certs/ec2configs.pem
+        owner: root
+        group: root
+        mode: 0644
+    - name: Copy private key
+      copy:
+        content: "{{ lookup('file', '../configs/ssl_certs/ec2configs-key.pem' ) }}"
+        dest: /etc/nginx/certs/ec2configs-key.pem
+        owner: root
+        group: root
+        mode: 0644
+
+- name: Build static files for frontend
+  become: true
+  shell: "cd {{ appDir.app_directory }}/frontend && rm -rf build/ && npm run build"
+
+- name: Move files to nginx path
+  become: true
+  shell: "rm -rf /usr/share/nginx/ec2configs/* && cp -r {{ appDir.app_directory }}/frontend/build/* /usr/share/nginx/ec2configs"
+
+- name: Restart nginx
+  become: true
+  service:
+    name: nginx
+    state: restarted
+    enabled: true

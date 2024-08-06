@@ -1,0 +1,10 @@
+- name: Configure fstab
+  become: true
+  lineinfile:
+    dest: "/etc/fstab"
+    line: "{{ main_host }}:{{ appData_dir }}    {{ appData_dir }}   nfs   defaults   0 0"
+
+- name: Mount
+  become: true
+  shell: mount -a
+

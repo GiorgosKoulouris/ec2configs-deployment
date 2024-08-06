@@ -1,0 +1,4 @@
+---
+update_command: apt update &&
+install_command: apt install -y
+upgrade_command: apt upgrade -y

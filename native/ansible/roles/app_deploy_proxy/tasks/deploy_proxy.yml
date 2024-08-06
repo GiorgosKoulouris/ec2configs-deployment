@@ -1,0 +1,104 @@
+---
+- name: Disable SELinux
+  become: true
+  selinux:
+    state: disabled
+  ignore_errors: true
+
+# - name: Fix nginx module version for RHEL 8 and OL8 OS
+#   become: true
+#   when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8'
+#   block:
+#     - name: Remove nginx current installation
+#       package:
+#         name:
+#           - nginx
+#         state: absent
+    
+#     - name: Fix module version, make 1.22 the default one
+#       shell: |
+#         yum module reset -y nginx
+#         yum module enable -y nginx:1.22
+
+# - name: Install nginx
+#   become: true
+#   package:
+#     name:
+#       - nginx
+#     state: latest
+
+# - name: Copy main nginx config file
+#   become: true
+#   copy:
+#     content: "{{ lookup('file', '../configs/proxy/nginx-main.conf' ) }}"
+#     dest: /etc/nginx/nginx.conf
+#     owner: root
+#     group: root
+#     mode: 0644
+
+# - name: Remove any user related options from the main nginx conf file
+#   become: true
+#   lineinfile:
+#     path: /etc/nginx/nginx.conf
+#     state: absent
+#     regexp: 'user *;'
+
+# - name: Add the correct user on main nginx conf file based on distro
+#   become: true
+#   lineinfile:
+#     path: /etc/nginx/nginx.conf
+#     insertbefore: '^worker_processes auto;'
+#     line: "user {{ nginx.user }};"
+    
+# - name: Copy proxy nginx conf file
+#   become: true
+#   copy:
+#     content: "{{ lookup('file', '../configs/proxy/proxy.conf' ) }}"
+#     dest: /etc/nginx/conf.d/proxy.conf
+#     owner: root
+#     group: root
+#     mode: 0644
+
+# - name: Copy SSL certificates
+#   become: true
+#   block:
+#     - name: Create necessary system directories
+#       file:
+#         path: /etc/nginx/certs
+#         state: directory
+#     - name: Copy certificate
+#       copy:
+#         content: "{{ lookup('file', '../configs/ssl_certs/ec2configs.pem' ) }}"
+#         dest: /etc/nginx/certs/ec2configs.pem
+#         owner: root
+#         group: root
+#         mode: 0644
+#     - name: Copy private key
+#       copy:
+#         content: "{{ lookup('file', '../configs/ssl_certs/ec2configs-key.pem' ) }}"
+#         dest: /etc/nginx/certs/ec2configs-key.pem
+#         owner: root
+#         group: root
+#         mode: 0644
+
+# - name: Insert frontend servers on nginx conf file
+#   become: true
+#   lineinfile:
+#     path: /etc/nginx/conf.d/proxy.conf
+#     insertafter: '^upstream frontend {'
+#     line: "{{ lookup('file', '../configs/proxy/frontend.ini' ) }}"
+
+# - name: Insert backend servers on nginx conf file
+#   become: true
+#   lineinfile:
+#     path: /etc/nginx/conf.d/proxy.conf
+#     insertafter: '^upstream backend {'
+#     line: "{{ lookup('file', '../configs/proxy/backend.ini' ) }}"
+
+# - name: Restart nginx
+#   become: true
+#   service:
+#     name: nginx
+#     state: restarted
+#     enabled: true
+

@@ -1,0 +1,18 @@
+---
+- name: Config NFS mounts | Load distribution variables
+  include_tasks: load_vars.yml
+
+- name: Config NFS mounts | Load service facts
+  service_facts:
+
+- name: Config NFS mounts | Install Packages
+  include_tasks: install_packages.yml
+
+- name: Config NFS mounts | Configure export
+  when: ansible_default_ipv4.address == main_host
+  include_tasks: configure_main.yml
+
+- name: Config NFS mounts | Configure mounts
+  when: ansible_default_ipv4.address != main_host
+  include_tasks: configure_rest.yml
+  

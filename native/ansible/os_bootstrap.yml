@@ -1,0 +1,14 @@
+---
+- name: Run Linux Bootstrap
+  become_method: sudo
+  become_user: root
+  hosts: allHosts
+  gather_facts: false
+  tasks:
+    - name: Linux Bootstrap | Wait for connection
+      wait_for_connection:
+    - name: Linux Bootstrap | Gather facts
+      setup:
+    - name: Linux Bootstrap | Run boostrap
+      include_role:
+        name: linux_os_bootstrap

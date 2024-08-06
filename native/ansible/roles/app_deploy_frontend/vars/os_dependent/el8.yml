@@ -1,0 +1,10 @@
+---
+nginx:
+  user: nginx
+fix_modules_command:
+  node: |
+    dnf module reset -y nodejs
+    dnf module enable -y nodejs:20
+  nginx: |
+    dnf module reset -y nginx
+    dnf module enable -y nginx:1.22

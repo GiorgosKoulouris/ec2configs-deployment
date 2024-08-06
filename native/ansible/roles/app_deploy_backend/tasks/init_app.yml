@@ -1,0 +1,70 @@
+- name: Copy environment files (unit)
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/backend/ec2c.service' ) }}"
+    dest: "/etc/systemd/system/ec2c.service"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy environment files (.env)
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/backend/.env' ) }}"
+    dest: "{{ appDir.app_directory }}/backend/.env"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Copy python environment files (.env)
+  become: true
+  copy:
+    content: "{{ lookup('file', '../configs/python/.env' ) }}"
+    dest: "{{ appDir.app_directory }}/python/.env"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: 0644
+
+- name: Install required python modules
+  become: true
+  pip:
+    requirements: "{{ appDir.app_directory }}/python/requirements.txt"
+
+- name: Remove existing terraform providers
+  become: true
+  shell: "rm -rf {{ appDir.appData_directory}}/providers/*"
+
+- name: Write terraform providers file
+  become: true
+  blockinfile:
+    create: true
+    dest: "{{ appDir.appData_directory }}/providers/init.tf"
+    block: "{{ tf_init_content }}"
+    
+- name: Mirror terraform providers
+  become: true
+  when: not ha_configured | default(false) | bool
+  shell: "cd {{ appDir.appData_directory}}/providers && terraform providers mirror ."
+
+- name: Install node packages for the backend application
+  become: true
+  community.general.npm:
+    path: "{{ appDir.app_directory }}/backend"
+    name: "{{ item }}"
+  with_items: 
+    - axios
+    - cors
+    - dotenv
+    - express
+    - kubernetes-client
+    - mysql
+    - passport
+    - passport-azure-ad
+    - uuid
+
+- name: Restart ec2c service
+  become: true
+  service:
+    name: ec2c
+    state: restarted
+    enabled: true
