@@ -14,6 +14,8 @@ User authentication is done via Entra ID, so having access to an Azure tenant wi
 
 Users can be defined as applications administrators. App admins have complete visibility and full access to all configurations. They can also create and delete user groups and add/remove users from them. Note that for a user to be present in the app, they need to have logged in to the application successfully at least once. For a user to be application admin, they need to be member of an Entra ID user group. This group's ID is defined during the application deployment and can change at anytime.
 
+Ream more on how to prepare the application and the tenant [here](https://learn.microsoft.com/en-us/entra/external-id/customers/tutorial-single-page-app-react-sign-in-prepare-tenant)
+
 ## Application Components
 
 The application has various elements and workloads that enable its full functionality. Briefly:
@@ -33,21 +35,6 @@ Deployment has been scripted/automated in order to reduce deployment time and st
 ### Native deployment
 
 Run each workload natively on one more hosts. All workloads can be distributed to one or more than one hosts to provide High Availability. Tests have shown that jobs are faster when the application is deployed natively but scaling and version control on High Availability deployments is tougher to maintain.
-
-#### Single Host
-
-This is the quickest and easiest way to deploy the app. All components and workloads are hosted on a single node (proxy, frontend, backend, terraform and python jobs, database). Although the application is not resource intensive, more resources are required when installing its npm dependencies and when building the static files for the frontend. For testing purposes, after building the application you could potentially downsize to even 1X1 machines.
-
-#### Multiple hosts
-
-In this sxenario, you can split the wokloads between more than one hosts. Any conbination is possible, for example:
-
-- 1 proxy, 1 frontend, 2 backend, 1 database
-- 1 proxy, 2 frontend, 2 backend, 1 database
-- 1 proxy 1 for frontend and backend, 2 databases
-- 1 proxy 1 for frontend and backend, 1 dedicated backend, 1 database
-
-Note that you will need a proxy host for every scenario. It is also possible to host extra workloads on the proxy host as well, but it is not recommended for security reasons.
 
 More information on how to deploy the app natively [here](./native/README.md)
 

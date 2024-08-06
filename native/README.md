@@ -2,7 +2,22 @@
 
 ## Overview
 
-Run each workload natively on one more hosts. All workloads can be distributed to one or more than one hosts to provide High Availability.
+Run each workload natively on one more hosts. All workloads can be distributed to one or more than one hosts to provide High Availability. Tests have shown that jobs are faster when the application is deployed natively but scaling and version control on High Availability deployments is tougher to maintain.
+
+#### Single Host
+
+This is the quickest and easiest way to deploy the app. All components and workloads are hosted on a single node (proxy, frontend, backend, terraform and python jobs, database). Although the application is not resource intensive, more resources are required when installing its npm dependencies and when building the static files for the frontend. For testing purposes, after building the application you could potentially downsize to even 1X1 machines.
+
+#### Multiple hosts
+
+In this sxenario, you can split the wokloads between more than one hosts. Any conbination is possible, for example:
+
+- 1 proxy, 1 frontend, 2 backend, 1 database
+- 1 proxy, 2 frontend, 2 backend, 1 database
+- 1 proxy 1 for frontend and backend, 2 databases
+- 1 proxy 1 for frontend and backend, 1 dedicated backend, 1 database
+
+Note that you will need a proxy host for every scenario. It is also possible to host extra workloads on the proxy host as well, but it is not recommended for security reasons.
 
 ## Prerequisites
 
@@ -125,7 +140,7 @@ git clone https://github.com/GiorgosKoulouris/ec2configs-deployment.git
 
 # Make sure that some predefined directories are present
 mkdir -p ec2configs-deployment/native/configs/ssl_certs
-mkdir -p ec2configs-deployment/native/amsible/ssh
+mkdir -p ec2configs-deployment/native/ansible/ssh
 
 # Paste the SSL certificate and key to the specific location
 # Certificate
@@ -133,7 +148,45 @@ vi ec2configs-deployment/native/configs/ssl_certs/ec2configs.pem
 # Key
 vi ec2configs-deployment/native/configs/ssl_certs/ec2configs-key.pem
 
+# Edit the inventory file
+vi ec2configs-deployment/native/ansible/01-hosts.ini
+
 # Execute the deployment script
 cd ec2configs-deployment/native/ansible
 ./00-deploy-app.sh
 ```
+
+## Add managed cloud accounts and subscriptions to the application
+
+EC2 Configs uses terraform in the background. Authentication for terraform is required and it is achieved via access keys for AWS and application secrets for Azure. To add a managed account to the application execute the following on the node hosting your database.
+
+```bash
+sudo -i
+mysql
+```
+
+While on the MariaDB cli, execute the following after changing the VALUES accordingly.
+
+For AWS accounts:
+
+```sql
+INSERT INTO `ec2c`.`aws_accounts` (`account_name`, `aws_id`, `fa_access_key`, `fa_secret`) VALUES 
+    (   'MY_Account_DisplayName',
+        'Account_ID',
+        'AKIASvnkjfhbvjhw',
+        'EXMPALEJEHFIA');
+```
+
+For Azure subscriptions:
+
+```sql
+
+INSERT INTO `ec2c`.`az_subscriptions` (`subscription_name`, `tenant_id`, `subscription_id`, `application_id`, `secret_value`) VALUES 
+    (   'My_Subscription_DisplayName',
+        '1234-sdfg-2343',
+        'koji-huy7-7867',
+        'qwwe-sdas-231e',
+        'secretValue');
+```
+
+No application restart is needed, if you navigate through the applicaiton's tab on your browser the new accounts/subscriptions will appear
