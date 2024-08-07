@@ -8,3 +8,5 @@ fix_modules_command:
     dnf remove -y npm
     dnf module reset -y nodejs
     dnf module enable -y nodejs:20
+node:
+  package: npm

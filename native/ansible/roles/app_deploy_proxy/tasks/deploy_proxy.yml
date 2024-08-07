@@ -1,6 +1,7 @@
 ---
 - name: Disable SELinux
   become: true
+  when: ansible_facts['distribution'] != 'Ubuntu'
   selinux:
     state: disabled
   ignore_errors: true

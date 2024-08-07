@@ -7,13 +7,9 @@
     - '"not mounted" not in umount_dir.stderr'
     - '"no mount point specified" not in umount_dir.stderr'
 
-- name: Get root FS type
-  shell: df -hT / | grep / | awk -F' ' '{print $2}'
-  register: fs_type
-
 - name: Create FS on the disk
   become: true
-  shell: "mkfs.{{ fs_type.stdout }} /dev/{{ appdata_diskname }} -f"
+  shell: "mkfs.xfs /dev/{{ appdata_diskname }} -f"
 
 - name: Create appdata mountpoint
   become: true
@@ -27,7 +23,7 @@
   ansible.posix.mount:
     path: "{{ appDir.appData_directory }}"
     src: "/dev/{{ appdata_diskname }}"
-    fstype: "{{ fs_type.stdout }}"
+    fstype: xfs
     opts: defaults
     state: present
 

@@ -207,7 +207,7 @@ disk_options_pre() {
         [Yy]*)
             APPDATA_DISK_ATTACHED='true'
             while true; do
-                read -rp "Enter the name of the disk, WITHOUT the /dev prefix (example: nvme1n1): " diskname
+                read -rp "Enter the name of the disk, WITHOUT the /dev prefix (example: nvme3n1): " diskname
                 if [ "$diskname" == '' ]; then
                     echo "Disk name cannot be empty."
                 else
@@ -291,6 +291,7 @@ frontend_options_pre() {
         esac
     done
 
+    echo
     while true; do
         read -rp "Enter the domain (server name) for nginx listeners (by default, this redirects www.mydomain.tld to mydomain.tld, so do not include www): " dmn
         if [ "$dmn" == '' ]; then
@@ -438,7 +439,7 @@ EOF
         read -rp "Type the IP of your frontend host: " ip
         echo "    server $ip;" >../configs/proxy/frontend.ini
         while true; do
-            read -rp "Add another host? (y\n): " action
+            read -rp "Add another frontend host? (y\n): " action
             case $action in
             [Yy]*)
                 read -rp "Type the IP of your frontend host: " ip
@@ -458,10 +459,10 @@ EOF
         read -rp "Type the IP of your backend host: " ip
         echo "    server $ip:30002;" >../configs/proxy/backend.ini
         while true; do
-            read -rp "Add another host? (y\n): " action
+            read -rp "Add another backend host? (y\n): " action
             case $action in
             [Yy]*)
-                read -rp "Type the IP of your frontend host: " ip
+                read -rp "Type the IP of your backend host: " ip
                 echo "    server $ip:30002;" >>../configs/proxy/backend.ini
                 ;;
             [Nn]*)
@@ -531,7 +532,8 @@ deploy_proxy() {
 }
 
 ask_ansible_become_pass() {
-
+    echo
+    print_line
     while true; do
         read -sp "Enter ansible become password: " pw
         if [ "$pw" == '' ]; then

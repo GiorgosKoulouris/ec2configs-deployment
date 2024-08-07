@@ -4,12 +4,24 @@
   when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8'
   shell: "{{ fix_modules_command.node }}"
 
+- name: Fix node version on Ubuntu distros
+  become: true
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  block:
+    - name: Install prerequisite packages for node upgrade on Ubuntu nodes
+      package:
+        state: latest
+        name: "{{ node.prerequisites }}" 
+        
+    - name: Fix node repositories on Ubuntu nodes
+      shell: "{{ node.repo_command }}"
+
 - name: Install Packages
   become: true
   package:
     state: latest
     name: 
-      - npm
+      - "{{ node.package }}"
       - git
       - python3
       - python3-pip

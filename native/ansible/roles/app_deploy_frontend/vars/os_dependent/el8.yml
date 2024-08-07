@@ -8,3 +8,5 @@ fix_modules_command:
   nginx: |
     dnf module reset -y nginx
     dnf module enable -y nginx:1.22
+node:
+  package: npm

@@ -23,11 +23,30 @@
     - name: Fix npm/node module versions
       shell: "{{ fix_modules_command.node }}"
 
+- name: Fix node version on Ubuntu distros
+  become: true
+  when: ansible_facts['distribution'] == 'Ubuntu' and 'backendHosts' not in group_names
+  block:
+    - name: Install prerequisite packages for node upgrade on Ubuntu nodes
+      package:
+        state: latest
+        name: "{{ node.prerequisites }}" 
+        
+    - name: Fix node repositories on Ubuntu nodes
+      shell: "{{ node.repo_command }}"
+
+- name: Install node relates packages
+  become: true
+  when: "'backendHosts' not in group_names"
+  package:
+    state: latest
+    name: "{{ node.package }}"
+
+
 - name: Install Packages
   become: true
   package:
     state: latest
     name: 
-      - npm
       - git
       - nginx
