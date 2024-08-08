@@ -1,3 +1,7 @@
 ---
 nginx:
   user: nginx
+fix_modules_command:
+  nginx: |
+    yum module reset -y nginx
+    yum module enable -y nginx:1.22

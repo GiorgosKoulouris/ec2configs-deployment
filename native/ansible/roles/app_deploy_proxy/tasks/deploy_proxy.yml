@@ -6,9 +6,9 @@
     state: disabled
   ignore_errors: true
 
-- name: Fix nginx module version for RHEL 8 and OL8 OS
+- name: Fix nginx module version for RHEL8, OL8 and Ubuntu
   become: true
-  when: ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8'
+  when: ( ansible_facts['distribution'] in ['OracleLinux','RedHat'] and ansible_facts['distribution_major_version'] == '8' ) or ( ansible_facts['distribution'] == 'Ubuntu' )
   block:
     - name: Remove nginx current installation
       package:
@@ -16,10 +16,8 @@
           - nginx
         state: absent
     
-    - name: Fix module version, make 1.22 the default one
-      shell: |
-        yum module reset -y nginx
-        yum module enable -y nginx:1.22
+    - name: Update nginx repos/modules
+      shell: "{{ fix_modules_command.nginx }}"
 
 - name: Install nginx
   become: true
