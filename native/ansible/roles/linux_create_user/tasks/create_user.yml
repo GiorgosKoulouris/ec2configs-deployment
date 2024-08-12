@@ -37,6 +37,8 @@
       when: user_options.alias_for_sudo is defined
       become: true
       blockinfile:
+        owner: "{{ username }}"
+        group: "{{ username }}"
         create: true
         content: "{{ user_options.alias_for_sudo }}"
         path: "/home/{{ username }}/.bash_profile"

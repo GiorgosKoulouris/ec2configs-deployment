@@ -54,7 +54,26 @@
 - name: Mirror terraform providers
   become: true
   when: not ha_configured | default(false) | bool
-  shell: "cd {{ appDir.appData_directory}}/providers && terraform providers mirror ."
+  shell: "cd {{ appDir.appData_directory }}/providers && terraform providers mirror ."
+
+- name: Copy terraform config file
+  become: true
+  blockinfile:
+    create: true
+    dest: "/home/{{ username }}/.terraformrc"
+    mode: 0644
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    block: |
+      provider_installation {
+        filesystem_mirror {
+          path = "{{ appDir.appData_directory }}/providers"
+          include = ["*/*"]
+        }
+        direct {
+          exclude = ["*/*"]
+        }
+      }
 
 - name: Install node packages for the backend application
   become: true
