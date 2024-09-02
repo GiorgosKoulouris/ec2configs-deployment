@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.backend.name }}-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.backend.name }}-app"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.backend.name }}-app"
+    spec:
+      serviceAccountName: "{{ .Values.backend.name }}-app-sa"
+      volumes:
+      - name: "{{ .Values.volumeNames.mainAppsData }}"
+        persistentVolumeClaim:
+          claimName: "{{ .Values.volumeNames.mainAppsData }}"
+      - name:  "{{ .Values.volumeNames.mainAppsLogs }}"
+        persistentVolumeClaim:
+          claimName:  "{{ .Values.volumeNames.mainAppsLogs }}"
+      imagePullSecrets:
+      - name: "{{ .Values.allPods.imagePullSecret }}"
+      containers:
+      - name: "{{ .Values.backend.name }}-app"
+        image: {{ include "imageIDs.backend" . }}
+        imagePullPolicy: {{ .Values.allPods.imagePullPolicy }}
+        ports:
+        - containerPort: 30002
+        volumeMounts:
+        - name: "{{ .Values.volumeNames.mainAppsData }}"
+          mountPath: /ec2c/data
+        - name: "{{ .Values.volumeNames.mainAppsLogs }}"
+          mountPath: /ec2c/logs
+        env:
+        - name: APP_ENV
+          value: kubernetes
+        - name: TZ
+          value: Europe/Athens
+        - name: AZ_CLIENT_ID
+          value: "{{ .Values.azure.AZ_CLIENT_ID }}"
+        - name: AZ_TENANT_ID
+          value: "{{ .Values.azure.AZ_TENANT_ID }}"
+        - name: AZ_ADMIN_GRP_ID
+          value: "{{ .Values.azure.AZ_ADMIN_GRP_ID }}"
+        - name: DB_HOST
+          value: {{ include "backend.calcValue.DB_HOST" . }}
+        - name: DB_PORT
+          value: "{{ include "backend.calcValue.DB_PORT" . }}"
+        - name: DB_DATABASE
+          value: "{{ .Values.backend.DB_DATABASE }}"
+        - name: KUBE_JOB_SA_NAME
+          value: "{{ .Values.backend.name }}-job-sa"
+        - name: KUBE_TF_IMAGE
+          value: {{ include "imageIDs.terraform" . }}
+        - name: KUBE_PY_IMAGE
+          value: {{ include "imageIDs.python" . }}
+        - name: KUBE_IMAGE_PULL_POLICY
+          value: "{{ .Values.allPods.imagePullPolicy }}"
+        - name: KUBE_IMAGE_PULL_CREDS
+          value: "{{ .Values.allPods.imagePullSecret }}"
+        - name: KUBE_PODUSERID_USER
+          value: "{{ .Values.allPods.runAsUser }}"
+        - name: KUBE_PODUSERID_GROUP
+          value: "{{ .Values.allPods.runAsGroup }}"
+        - name: KUBE_APPDATA_VOL_NAME
+          value: "{{ .Values.volumeNames.mainAppsData }}"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.backend.DB_SECRET_NAME }}"
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.backend.DB_SECRET_NAME }}"
+              key: password
+        - name: NODE_UID
+          value: "{{ .Values.allPods.runAsUser }}"
+        - name: NODE_GID
+          value: "{{ .Values.allPods.runAsGroup }}"

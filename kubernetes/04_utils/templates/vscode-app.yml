@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.vscode.name }}-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.vscode.name }}-app"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.vscode.name }}-app"
+    spec:
+      volumes:
+        - name: {{ .Values.volumeNames.mainAppsData }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumeNames.mainAppsData }}
+        - name: {{ .Values.volumeNames.mainAppsLogs }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumeNames.mainAppsLogs }}
+        - name: {{ .Values.volumeNames.kubeConfData }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumeNames.kubeConfData }}    
+      containers:
+      - name: {{ .Values.vscode.name }}
+        image: lscr.io/linuxserver/openvscode-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: {{ .Values.volumeNames.mainAppsData }}
+          mountPath: /ec2c/app/configs
+        - name: {{ .Values.volumeNames.mainAppsLogs }}
+          mountPath: /ec2c/app/logs
+        - name: {{ .Values.volumeNames.kubeConfData }}
+          mountPath: /ec2c/kube
+        env:
+        - name: PUID
+          value: "{{ .Values.runAsUser.userID }}"
+        - name: PGID
+          value: "{{ .Values.runAsUser.groupID }}"

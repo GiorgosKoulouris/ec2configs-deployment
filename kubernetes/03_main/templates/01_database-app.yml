@@ -1,0 +1,58 @@
+{{- if eq .Values.database.create true -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.database.name }}-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.database.name }}-app"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.database.name }}-app"
+    spec:
+      securityContext:
+        runAsUser: {{ .Values.allPods.runAsUser }}
+        runAsGroup: {{ .Values.allPods.runAsGroup }}
+        fsGroup: {{ .Values.allPods.runAsGroup }}
+      volumes:
+      - name: "{{ .Values.volumeNames.mainDtbsData }}"
+        persistentVolumeClaim:
+          claimName: "{{ .Values.volumeNames.mainDtbsData }}"
+      - name: "{{ .Values.volumeNames.mainDtbsDump }}"
+        persistentVolumeClaim:
+          claimName: "{{ .Values.volumeNames.mainDtbsDump }}"
+      imagePullSecrets:
+      - name: {{ .Values.allPods.imagePullSecret }}
+      containers:
+      - name: "{{ .Values.database.name }}-app"
+        image: {{ include "imageIDs.database" . }}
+        imagePullPolicy: {{ .Values.allPods.imagePullPolicy }}
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: "{{ .Values.volumeNames.mainDtbsData }}"
+          mountPath: /var/lib/mysql
+        - name: "{{ .Values.volumeNames.mainDtbsDump }}"
+          mountPath: /dumps
+        env:
+        - name: MYSQL_DATABASE
+          value: ec2c
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.backend.DB_SECRET_NAME }}"
+              key: rootPass
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.backend.DB_SECRET_NAME }}"
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Values.backend.DB_SECRET_NAME }}"
+              key: password
+{{- end -}}

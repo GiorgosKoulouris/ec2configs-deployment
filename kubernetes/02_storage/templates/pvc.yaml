@@ -1,0 +1,15 @@
+{{- range $index, $storage := .Values.storage.paths -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ec2c-strg-{{ $storage.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ $storage.size }}
+  volumeName: ec2c-strg-{{ $storage.name }}
+---
+{{- end }}

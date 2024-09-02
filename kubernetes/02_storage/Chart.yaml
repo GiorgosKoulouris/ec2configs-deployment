@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ec2c-storage
+description: PVs and PVCs for EC2C
+version: 0.1.0

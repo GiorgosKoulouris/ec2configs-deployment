@@ -40,10 +40,10 @@ More information on how to deploy the app natively [here](./native/README.md)
 
 ### Kubernetes deployment
 
-In this scenario, you will need a K8 cluster that is going to host the environment. As mentioned above, you can also host the database within the cluster, but it has not been tested. Every workload is going to be delegated to either one or more containers (backend and frontend) or to one-off jobs that execute adhoc actions (file creation, terraform jobs etc).
+In this scenario, you will need a K8 cluster that is going to host the environment. Every workload is going to be delegated to either one or more containers (backend and frontend) or to one-off jobs that execute adhoc actions (file creation, terraform jobs etc).
 
-As of now, in order to customize the frontend application (which is an essential step in order to properly define all the Azure related variables), you need to rebuild the image. This is hopefully to be imporoved in the future, so that the public images off the application can be used for the whole landscape of the app.
+More information on how to deploy the app on an existing kubernetes cluster [here](./kubernetes/README.md)
 
 ## Considerations
 
-When a scenario that consists of multiple nodes is deployed, there are specific prerequisites regarding the environment that need to be met. For example, specific connectivity needs to be allows between the different hosts and backend or cluster nodes need to have shared folders/filesystems. This is standarized in the scripted deployments but you can modify them to suit your needs. For example, filesystems/folders are exported from some hosts and are mounted to other. This can also be achieved via various cloud concepts (EFS, Storage Accounts etc), but the automated deployments are developed to by as cloud-agnostic as possible.
+When a scenario that consists of multiple nodes is deployed, there are specific prerequisites regarding the environment that need to be met. For example, specific connectivity needs to be allowed between the different hosts and backend or cluster nodes need to have shared folders/filesystems. This is standarized in the scripted deployments but you can modify them to suit your needs. For example, filesystems/folders are exported from some hosts and are mounted to other. This can also be achieved via various cloud concepts (EFS, Storage Accounts etc), but the automated deployments are developed to by as cloud-agnostic as possible.

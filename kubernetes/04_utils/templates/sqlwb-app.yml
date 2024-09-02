@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.sqlwb.name }}-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.sqlwb.name }}-app"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.sqlwb.name }}-app"
+    spec:
+      volumes:
+        - name: {{ .Values.volumeNames.utilMswbData }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volumeNames.utilMswbData }}
+      containers:
+      - name: {{ .Values.sqlwb.name }}
+        image: lscr.io/linuxserver/mysql-workbench:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: {{ .Values.volumeNames.utilMswbData }}
+          mountPath: /config
+        securityContext:
+          allowPrivilegeEscalation: true
+        env:
+        - name: PUID
+          value: "{{ .Values.runAsUser.userID }}"
+        - name: PGID
+          value: "{{ .Values.runAsUser.groupID }}"

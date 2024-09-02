@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ec2c-utils
+description: Utility pods for EC2C
+version: 0.1.0

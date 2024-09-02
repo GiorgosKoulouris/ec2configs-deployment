@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ec2c-main
+description: Main workloads for EC2C
+version: 0.1.0

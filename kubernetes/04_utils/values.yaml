@@ -1,0 +1,14 @@
+vscode:
+  name: ec2c-util-vscode
+  nodePort: 30010
+sqlwb:
+  name: ec2c-util-sqlwb
+  nodePort: 30011
+volumeNames:
+  utilMswbData: ec2c-strg-util-mswb-data # This is based on the name of the created Volumes on 02_storage
+  mainAppsData: ec2c-strg-main-apps-data # This is based on the name of the created Volumes on 02_storage
+  mainAppsLogs: ec2c-strg-main-apps-logs # This is based on the name of the created Volumes on 02_storage
+  kubeConfData: ec2c-strg-util-kube-data # This is based on the name of the created Volumes on 02_storage
+runAsUser:
+  userID: 1003 # Change this based on the id of the user you created
+  groupID: 1003 # Change this based on the id of the user you created

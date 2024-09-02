@@ -1,0 +1,24 @@
+{{- range $index, $storage := .Values.storage.paths -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ec2c-strg-{{ $storage.name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  capacity:
+    storage: {{ $storage.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  {{- if eq $storage.type "nfs" }}
+  nfs:
+    server: {{ $storage.nfsServer }}
+    path: {{ $storage.path }}
+  {{- else if eq $storage.type "hostpath" }}
+  hostPath:
+    path: {{ $storage.path }}
+  {{- end }}
+  persistentVolumeReclaimPolicy: Retain
+---
+{{- end }}
+

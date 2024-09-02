@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ec2c-db-creds
+type: kubernetes.io/basic-auth
+stringData:
+  rootPass: placeholder
+  username: placeholder
+  password: placeholder

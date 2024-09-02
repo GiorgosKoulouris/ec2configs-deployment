@@ -1,0 +1,36 @@
+# Type is nfs or hostpath
+# When type is hostpath, nfsServer value is ignored
+# Do not change the names as they are referenced in the other charts
+# Adding another element in the array will provision extra PVs and PVCs. No more Volumes are required for the app, but you can use this for anything else as well
+storage:
+  paths:
+    - name: main-dtbs-data
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /appData/db/db
+      size: 1Gi
+    - name: main-dtbs-dump
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /appData/db/dumps
+      size: 1Gi
+    - name: main-apps-data
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /appData/configs
+      size: 3Gi
+    - name: main-apps-logs
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /appData/logs
+      size: 3Gi
+    - name: util-mswb-data
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /appData/utils/sqlwb
+      size: 1Gi
+    - name: util-kube-data
+      type: nfs
+      nfsServer: 10.130.100.206
+      path: /kubeConfigs/ec2c
+      size: 1Gi

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.frontend.name }}-app"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ .Values.frontend.name }}-app"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.frontend.name }}-app"
+    spec:
+      imagePullSecrets:
+      - name: {{ .Values.allPods.imagePullSecret }}
+      containers:
+      - name: "{{ .Values.frontend.name }}-app"
+        image: {{ include "imageIDs.frontend" . }}
+        imagePullPolicy: {{ .Values.allPods.imagePullPolicy }}
+        ports:
+        - containerPort: 80
+        env:
+        - name: TZ
+          value: Europe/Athens
+        - name: AZ_AUTHORITY
+          value: "{{ .Values.azure.AZ_TENANT_ID }}"
+        - name: AZ_CLIENT_ID
+          value: "{{ .Values.azure.AZ_CLIENT_ID }}"
+        - name: AZ_ADMIN_GRP_ID
+          value: "{{ .Values.azure.AZ_ADMIN_GRP_ID }}"
+        - name: BACKEND_URL
+          value: {{ include "frontend.calcValue.backendURL" . }}

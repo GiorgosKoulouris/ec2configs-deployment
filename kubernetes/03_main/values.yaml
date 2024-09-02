@@ -1,0 +1,42 @@
+appVersion: "1.0.0" # 1.0.0 / latest
+azure:
+  AZ_TENANT_ID: XXXX-XXXXX-XXXX # Azure tenant of the enterprise application
+  AZ_CLIENT_ID: XXXX-XXXXX-XXXX # Application ID
+  AZ_ADMIN_GRP_ID: XXXX-XXXXX-XXXX # Users in this Entra Group will be assigned as admins of EC2 Configs app
+allPods:
+  imagePullPolicy: Always
+  imagePullSecret: none # The name of the secret created on 00_secrets. If set to 'none', it is completely ignored
+  runAsUser: 1003 # Change this based on the id of the user you created
+  runAsGroup: 1003 # Change this based on the id of the user you created
+database:
+  create: true # Set to false if you are going to use a DB outside the cluster. if false, set the backend.DB_HOST and backend.DB_PORT values 
+  name: ec2c-main-dtbs
+  servicePort: 3306
+  image: public.ecr.aws/gkoulouris/ec2c-database # If this is changed to a private repository, allPods.imagePullSecret MUST NOT be 'none' and the relevant secret must have been created.
+frontend:
+  name: ec2c-main-frnt
+  servicePort: 30001
+  image: public.ecr.aws/gkoulouris/ec2c-frontend-app # If this is changed to a private repository, allPods.imagePullSecret MUST NOT be 'none' and the relevant secret must have been created.
+backend:
+  name: ec2c-main-bcke
+  servicePort: 30002
+  image: public.ecr.aws/gkoulouris/ec2c-backend-app # If this is changed to a private repository, allPods.imagePullSecret MUST NOT be 'none' and the relevant secret must have been created.
+  DB_HOST: 10.10.10.10 # This is used only when database.create is set to false. Otherwise, communication with the DB is autoconfigured
+  DB_PORT: 3306        # This is used only when database.create is set to false. Otherwise, communication with the DB is autoconfigured
+  DB_DATABASE: ec2c # Name of the installed database. Do not change unless you have modified the database
+  DB_SECRET_NAME: ec2c-db-creds # The name of the secret you created on 00_secrets
+jobs:
+  images:
+    tf: public.ecr.aws/gkoulouris/ec2c-terraform-job # If this is changed to a private repository, allPods.imagePullSecret MUST NOT be 'none' and the relevant secret must have been created.
+    py: public.ecr.aws/gkoulouris/ec2c-python-job # If this is changed to a private repository, allPods.imagePullSecret MUST NOT be 'none' and the relevant secret must have been created.
+ingress:
+  className: nginx # Default is nginx and the controller is deployed in 01_ingress-controller (nodePort is default). Change this if you have deployed another ingress controller
+  name: ec2c-ingr-ndpt
+  domain: ec2configs.com
+  tlsSecretName: ec2c-ssl-cert # The tls secret name you created on 00_secrets
+volumeNames:
+  mainAppsData: ec2c-strg-main-apps-data # Based on the PVs created on 02_storage.
+  mainAppsLogs: ec2c-strg-main-apps-logs # Based on the PVs created on 02_storage.
+  mainDtbsData: ec2c-strg-main-dtbs-data # Based on the PVs created on 02_storage.
+  mainDtbsDump: ec2c-strg-main-dtbs-dump # Based on the PVs created on 02_storage.
+

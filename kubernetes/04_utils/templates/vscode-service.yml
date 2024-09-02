@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.vscode.name }}-svc"
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 3000
+      nodePort: {{ .Values.vscode.nodePort }}
+  selector:
+    app: "{{ .Values.vscode.name }}-app"
