@@ -90,6 +90,7 @@ grep -Eiv "(appData|kubeConfigs)" /etc/exports > tmpFile; rm -f /etc/exports; mv
 echo "/appData      $clusterSubnet(rw)" >> /etc/exports
 echo "/kubeConfigs  $clusterSubnet(rw)" >> /etc/exports
 exportfs -r
+exportfs -s # Verify
 ```
 
 ### Deploy the application
@@ -98,7 +99,7 @@ exportfs -r
 
 ```bash
 git clone https://github.com/GiorgosKoulouris/ec2configs-deployment.git
-mv -r ec2configs-deployment/kubernetes/* /kubeConfigs/ec2c
+mv ec2configs-deployment/kubernetes/* /kubeConfigs/ec2c
 rm -rf ec2configs-deployment
 chown -R $podUserID:$podGroupID /kubeConfigs/*
 ```
@@ -140,7 +141,7 @@ kubectl get all -n ingress-nginx
 vi /kubeConfigs/ec2c/02_storage/values.yaml
 helm install ec2c-storage /kubeConfigs/ec2c/02_storage/
 # Verify
-kubectl get pv && kubectl get pvc
+kubectl get pv -o wide && kubectl get pvc -o wide
 ```
 
 #### Deploy the main workloads
@@ -148,6 +149,8 @@ kubectl get pv && kubectl get pvc
 ```bash
 vi /kubeConfigs/ec2c/03_main/values.yaml
 helm install ec2c-workloads /kubeConfigs/ec2c/03_main/
+# Verify
+kubectl get all -o wide
 ```
 
 #### Deploy ec2c utility pods
@@ -199,3 +202,8 @@ INSERT INTO `ec2c`.`aws_accounts` (`account_name`, `aws_id`, `fa_access_key`, `f
         'AKIASvnkjfhbvjhw',
         'EXMPALEJEHFIA');
 ```
+
+Since the region list on both AWS and Azure is really long, you can delete any entry you don't plan to use.
+
+- **For AWS**: Delete entries from the *aws_regions* table of *ec2c* database
+- **For Azure**: Delete entries from the *az_regions* table of *ec2c* database
