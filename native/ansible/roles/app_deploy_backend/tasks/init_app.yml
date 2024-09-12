@@ -85,7 +85,7 @@
     - cors
     - dotenv
     - express
-    - kubernetes-client
+    - "@kubernetes/client-node"
     - mysql
     - passport
     - passport-azure-ad
