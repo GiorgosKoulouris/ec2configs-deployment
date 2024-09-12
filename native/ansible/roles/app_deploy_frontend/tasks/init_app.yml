@@ -129,6 +129,18 @@
   become: true
   shell: "rm -rf /usr/share/nginx/ec2configs/* && cp -r {{ appDir.app_directory }}/frontend/build/* /usr/share/nginx/ec2configs"
 
+- name: Modify static files for frontend based on user environment
+  become: true
+  shell: |
+    BACKEND_URL=$(grep REACT_APP_BACKEND_URL {{ appDir.app_directory }}/frontend/.env | awk -F '=' '{print $2}')
+    sed -i -e "s|\"REACT_APP_BACKEND_URL_PH\"|'$BACKEND_URL'|g" /usr/share/nginx/ec2configs/index.html
+    AZ_CLIENT_ID=$(grep REACT_APP_AZ_CLIENT_ID {{ appDir.app_directory }}/frontend/.env | awk -F '=' '{print $2}')
+    sed -i -e "s|\"REACT_APP_AZ_CLIENT_ID_PH\"|'$AZ_CLIENT_ID'|g" /usr/share/nginx/ec2configs/index.html
+    AZ_AUTHORITY=$(grep REACT_APP_AZ_AUTHORITY {{ appDir.app_directory }}/frontend/.env | awk -F '=' '{print $2}')
+    sed -i -e "s|\"REACT_APP_AZ_AUTHORITY_PH\"|'$AZ_AUTHORITY'|g" /usr/share/nginx/ec2configs/index.html
+    AZ_ADMIN_GRP_ID=$(grep REACT_APP_AZ_ADMIN_GRP_ID {{ appDir.app_directory }}/frontend/.env | awk -F '=' '{print $2}')
+    sed -i -e "s|\"REACT_APP_AZ_ADMIN_GRP_ID_PH\"|'$AZ_ADMIN_GRP_ID'|g" /usr/share/nginx/ec2configs/index.html
+
 - name: Restart nginx
   become: true
   service:
