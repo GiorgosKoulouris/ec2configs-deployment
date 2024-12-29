@@ -478,12 +478,6 @@ EOF
 
 }
 
-os_bootstrap() {
-    ansible-playbook os_bootstrap.yml -i 01-hosts.ini -e \
-        "patch=true \
-        ansible_become_password=$ANSIBLE_BECOME_PASS"
-}
-
 create_user() {
     ansible-playbook os_create_user.yml -i 01-hosts.ini -e \
         "username=$EC2C_ADMIN \
@@ -560,7 +554,6 @@ main() {
     frontend_options_pre
     proxy_options_pre
 
-    os_bootstrap
     create_user
     deploy_db
     deploy_backend
